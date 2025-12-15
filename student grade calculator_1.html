@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Grade Calculator</title>
+
+  <style>
+    :root {
+      --accent:#002B5B;
+      --accent2:#003e84;
+      --bg:#eef3ff;
+      --pass:#0e9f6e;
+      --fail:#d60000;
+    }
+
+    body {
+      margin:0;
+      background:var(--bg);
+      font-family:Arial;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:15px;
+    }
+
+    .top-header {
+      text-align:center;
+      margin-top:5px;
+      margin-bottom:15px;
+    }
+
+    .top-header img {
+      width:120px;
+      height:120px;
+      object-fit:contain;
+      filter: drop-shadow(0 0 10px #002B5B);
+    }
+
+    .top-header h1 {
+      font-size:28px;
+      color:var(--accent);
+      font-weight:900;
+      margin-top:8px;
+      letter-spacing:1px;
+    }
+
+    .card {
+      width:620px;
+      max-width:100%;
+      padding:28px;
+      background:#ffffff;
+      border-left:8px solid var(--accent);
+      border-radius:16px;
+      box-shadow:
+        0 0 0 3px rgba(0,43,91,0.15),
+        0 8px 20px rgba(0,0,0,0.20);
+    }
+
+    form {
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    h2 {
+      font-size:20px;
+      color:var(--accent);
+      font-weight:800;
+      margin:5px 0;
+      padding-bottom:5px;
+      border-bottom:2px solid #c7d9ff;
+    }
+
+    .row {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .row label {
+      width:310px;
+      font-size:16px;
+      font-weight:700;
+      color:var(--accent);
+    }
+
+    .row input {
+      flex:1;
+      padding:10px;
+      font-size:16px;
+      border-radius:10px;
+      border:2px solid #bdd3ff;
+      background:white;
+    }
+
+    .btn-row {
+      display:flex;
+      gap:12px;
+    }
+
+    button {
+      flex:1;
+      padding:12px;
+      font-size:17px;
+      font-weight:800;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      color:white;
+    }
+
+    .secondary {
+      background:#dbeafe;
+      color:#002B5B;
+    }
+
+    .result-box {
+      margin-top:18px;
+      padding:18px;
+      background:#fff;
+      border:2px solid #cfe0ff;
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.15);
+      font-size:16px;
+    }
+
+    .pass { color:var(--pass); font-weight:bold; }
+    .fail { color:var(--fail); font-weight:bold; }
+
+    .result-row {
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      font-weight:600;
+      color:var(--accent);
+      border-bottom:1px dashed #cfe0ff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-header">
+    <img src="C:/Users/Vanishree/Desktop/logo.png" alt="College Logo">
+    <h1>NEW HORIZON COLLEGE OF ENGINEERING</h1>
+  </div>
+
+  <div class="card">
+
+    <form id="gradeForm" onsubmit="event.preventDefault(); calculateGrade();">
+
+      <h2>Student Information</h2>
+
+      <div class="row">
+        <label>Name</label>
+        <input type="text" id="name" placeholder="Enter Name"
+        oninput="this.value=this.value.replace(/[0-9]/g,'')">
+      </div>
+
+      <div class="row">
+        <label>USN</label>
+        <!-- ⭐ FULLY UPDATED: ALLOWS SPECIAL CHARACTERS ⭐ -->
+        <input type="text" id="usn" placeholder="Enter USN"
+        oninput="this.value = this.value.toUpperCase();" autocomplete="off">
+      </div>
+
+      <h2>Enter Subject Marks</h2>
+
+      <div class="row">
+        <label>Software Engineering & Project Management</label>
+        <input type="number" id="sub1" placeholder="Marks" oninput="clamp(this)">
+      </div>
+
+      <div class="row">
+        <label>Mathematics</label>
+        <input type="number" id="sub2" placeholder="Marks" oninput="clamp(this)">
+      </div>
+
+      <div class="row">
+        <label>Digital Logic Design</label>
+        <input type="number" id="sub3" placeholder="Marks" oninput="clamp(this)">
+      </div>
+
+      <div class="row">
+        <label>Optimization Technique</label>
+        <input type="number" id="sub4" placeholder="Marks" oninput="clamp(this)">
+      </div>
+
+      <div class="row">
+        <label>Web Design Technology</label>
+        <input type="number" id="sub5" placeholder="Marks" oninput="clamp(this)">
+      </div>
+
+      <div class="row">
+        <label>Advanced Data Structure</label>
+        <input type="number" id="sub6" placeholder="Marks" oninput="clamp(this)">
+      </div>
+
+      <div class="btn-row">
+        <button type="submit">Calculate</button>
+        <button type="button" class="secondary" onclick="resetForm()">Reset</button>
+      </div>
+
+    </form>
+
+    <div id="output" class="result-box" style="display:none"></div>
+
+  </div>
+
+<script>
+  function clamp(el){
+    let v = Number(el.value);
+    if(el.value === '') return;
+    if(isNaN(v)) el.value='';
+    if(v < 0) el.value = 0;
+    if(v > 100) el.value = 100;
+  }
+
+  function calculateGrade() {
+    let name = document.getElementById("name").value.trim();
+    let usn = document.getElementById("usn").value.trim();
+
+    let subjects = [];
+    let names = [
+      "Software Engineering & Project Management",
+      "Mathematics",
+      "Digital Logic Design",
+      "Optimization Technique",
+      "Web Design Technology",
+      "Advanced Data Structure"
+    ];
+
+    for (let i = 1; i <= 6; i++) {
+        let value = document.getElementById("sub" + i).value.trim();
+
+        if (value === "") {
+            alert("Please enter all marks before calculating!");
+            return;
+        }
+
+        let m = Number(value);
+        if (isNaN(m)) {
+            alert("Please enter valid marks!");
+            return;
+        }
+
+        subjects.push(m);
+    }
+
+    if (subjects.some(m => m < 35)) {
+        let list = "<h3 style='color:red;'>FAIL</h3>";
+
+        list += "<h4>Subject-wise Result:</h4><ul>";
+
+        for (let i = 0; i < 6; i++) {
+            let status = subjects[i] >= 35
+              ? `<span class='pass'>PASS</span>`
+              : `<span class='fail'>FAIL</span>`;
+            list += `<li>${names[i]}: ${status}</li>`;
+        }
+
+        list += "</ul>";
+
+        show(list);
+        return;
+    }
+
+    let total = subjects.reduce((a,b)=>a+b,0);
+    let percentage = (total / 600) * 100;
+    let avg = total / 6;
+
+    let grade = "";
+    if (avg >= 90) grade = "A+";
+    else if (avg >= 80) grade = "A";
+    else if (avg >= 70) grade = "B";
+    else if (avg >= 60) grade = "C";
+    else if (avg >= 50) grade = "D";
+    else grade = "FAIL";
+
+    let list = `
+      <div><b>Name:</b> ${name}</div>
+      <div><b>USN:</b> ${usn}</div>
+      <hr>
+
+      <div class="result-row"><span>Total</span><span>${total} / 600</span></div>
+      <div class="result-row"><span>Average</span><span>${avg.toFixed(2)}</span></div>
+      <div class="result-row"><span>Percentage</span><span>${percentage.toFixed(2)}%</span></div>
+      <div class="result-row"><span>Grade</span><span>${grade}</span></div>
+
+      <br>
+      <h4>Subject-wise Result:</h4>
+      <ul>
+    `;
+
+    for (let i = 0; i < 6; i++) {
+        let status = subjects[i] >= 35
+          ? `<span class='pass'>PASS</span>`
+          : `<span class='fail'>FAIL</span>`;
+        list += `<li>${names[i]}: ${status}</li>`;
+    }
+
+    list += "</ul>";
+
+    show(list);
+  }
+
+  function show(html){
+    const out = document.getElementById("output");
+    out.innerHTML = html;
+    out.style.display = "block";
+  }
+
+  function resetForm(){
+    document.getElementById("gradeForm").reset();
+    document.getElementById("output").style.display="none";
+  }
+</script>
+
+</body>
+</html>
